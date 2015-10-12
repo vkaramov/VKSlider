@@ -12,7 +12,7 @@ public class VKSlider: UIControl
 {
     /// Start color of gradient background. Has no effect if gradientColorEnd is nil. Default nil.
     @IBInspectable public var gradientColorStart: UIColor? = nil
-    {
+        {
         didSet
         {
             updateBackgroundColor();
@@ -21,7 +21,7 @@ public class VKSlider: UIControl
     
     /// End color of gradient background. Has no effect if gradientColorStart is nil. Default nil.
     @IBInspectable public var gradientColorEnd: UIColor? = nil
-    {
+        {
         didSet
         {
             updateBackgroundColor();
@@ -30,7 +30,7 @@ public class VKSlider: UIControl
     
     /// Knob's colour
     @IBInspectable public var knobColor: UIColor = UIColor.whiteColor()
-    {
+        {
         didSet
         {
             sliderView.backgroundColor = knobColor
@@ -41,7 +41,7 @@ public class VKSlider: UIControl
     
     /// Slider's text colour
     @IBInspectable public var textColor: UIColor = UIColor.greenColor()
-    {
+        {
         didSet
         {
             for label in backgroundLabels
@@ -53,7 +53,7 @@ public class VKSlider: UIControl
     
     /// Slider's corner radius
     @IBInspectable public var cornerRadius: CGFloat = 5.0
-    {
+        {
         didSet
         {
             layer.cornerRadius = cornerRadius
@@ -71,7 +71,7 @@ public class VKSlider: UIControl
     
     /// Knob inset
     @IBInspectable public var knobInset: CGFloat = 2.0
-    {
+        {
         didSet
         {
             setNeedsLayout()
@@ -79,7 +79,7 @@ public class VKSlider: UIControl
     }
     
     public var titles:[String]!
-    {
+        {
         didSet
         {
             setupBackgroundLabels()
@@ -88,7 +88,7 @@ public class VKSlider: UIControl
     
     
     public var font: UIFont = UIFont.preferredFontForTextStyle(UIFontTextStyleBody)
-    {
+        {
         didSet
         {
             for label in backgroundLabels
@@ -104,8 +104,8 @@ public class VKSlider: UIControl
     private var knobFrameUpdated = false;
     private var sliderView: UIView!
     private var sliderWidth: CGFloat
-    {
-        return CGRectGetWidth(backgroundLabels[selectedIndex].frame)
+        {
+            return CGRectGetWidth(backgroundLabels[selectedIndex].frame)
     }
     
     // MARK: Initializers
@@ -138,7 +138,7 @@ public class VKSlider: UIControl
     {
         setupBackground();
         setupSliderView();
-
+        
         setNeedsLayout();
     }
     
@@ -205,7 +205,7 @@ public class VKSlider: UIControl
         
         addSubview(sliderView);
     }
-
+    
     
     // MARK: Layout
     
@@ -246,6 +246,22 @@ public class VKSlider: UIControl
             frame.origin.y = 0
             frame.size.height = bounds.height
             label.frame = frame
+        }
+        if let lastLabel = backgroundLabels.last
+        {
+            let extraSpace = CGRectGetWidth(self.frame) - CGRectGetMaxX(lastLabel.frame);
+            if (extraSpace > 4.0) // let it be 4.0 pt
+            {
+                let spaceForEach = extraSpace / CGFloat(backgroundLabels.count);
+                for (index, label) in backgroundLabels.enumerate()
+                {
+                    var frame = label.frame;
+                    frame.size.width += spaceForEach;
+                    frame.origin.x = (index > 0) ? CGRectGetMaxX(backgroundLabels[index - 1].frame) + labelMargin: labelMargin;
+                    
+                    label.frame = frame;
+                }
+            }
         }
     }
     
@@ -376,7 +392,7 @@ public class VKSlider: UIControl
         case .Min:
             x = CGRectGetMinX(sliderView.frame);
             break;
-        
+            
         case .Center:
             x = sliderView.center.x;
             break;
