@@ -29,7 +29,7 @@ class ViewController: UIViewController
     
     @IBAction func changeSelectedIndex(sender: VKSlider)
     {
-        selectedIndexLabel.text = "Selected Index: \(sender.selectedIndex)"
+        selectedIndexLabel.text = "Selected Index: \(sender.getSelectedIndex())"
     }
 
 

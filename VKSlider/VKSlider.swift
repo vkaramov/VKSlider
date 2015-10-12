@@ -10,6 +10,24 @@ import UIKit
 
 public class VKSlider: UIControl
 {
+    /// Start color of gradient background. Has no effect if gradientColorEnd is nil. Default nil.
+    @IBInspectable public var gradientColorStart: UIColor? = nil
+    {
+        didSet
+        {
+            updateBackgroundColor();
+        }
+    }
+    
+    /// End color of gradient background. Has no effect if gradientColorStart is nil. Default nil.
+    @IBInspectable public var gradientColorEnd: UIColor? = nil
+    {
+        didSet
+        {
+            updateBackgroundColor();
+        }
+    }
+    
     /// Knob's colour
     @IBInspectable public var knobColor: UIColor = UIColor.whiteColor()
     {
@@ -68,8 +86,8 @@ public class VKSlider: UIControl
         }
     }
     
-    var selectedIndex: Int = 0
-    var font: UIFont = UIFont.preferredFontForTextStyle(UIFontTextStyleBody)
+    
+    public var font: UIFont = UIFont.preferredFontForTextStyle(UIFontTextStyleBody)
     {
         didSet
         {
@@ -82,6 +100,7 @@ public class VKSlider: UIControl
     
     private var labelMargin:CGFloat = 4.0
     private var backgroundLabels: [UILabel] = []
+    private var selectedIndex: Int = 0
     private var knobFrameUpdated = false;
     private var sliderView: UIView!
     private var sliderWidth: CGFloat
@@ -117,10 +136,10 @@ public class VKSlider: UIControl
     
     private func setup()
     {
-        setupBackground()
-        setupSliderView()
+        setupBackground();
+        setupSliderView();
 
-        setNeedsLayout()
+        setNeedsLayout();
     }
     
     private func setupBackground()
@@ -151,6 +170,27 @@ public class VKSlider: UIControl
         invalidateIntrinsicContentSize()
     }
     
+    private func updateBackgroundColor()
+    {
+        if let start = gradientColorStart, end = gradientColorEnd
+        {
+            var gradientLayer : CAGradientLayer;
+            if let firstLayer = layer.sublayers?.first as? CAGradientLayer
+            {
+                gradientLayer = firstLayer;
+            }
+            else
+            {
+                gradientLayer = CAGradientLayer();
+                gradientLayer.startPoint = CGPoint(x: 0, y: 0.5);
+                gradientLayer.endPoint = CGPoint(x: 1, y: 0.5);
+            }
+            gradientLayer.frame = bounds;
+            gradientLayer.colors = [start.CGColor, end.CGColor];
+            layer.insertSublayer(gradientLayer, atIndex: 0);
+        }
+    }
+    
     private func setupSliderView()
     {
         sliderView = UIView();
@@ -171,10 +211,11 @@ public class VKSlider: UIControl
     
     override public func layoutSubviews()
     {
-        super.layoutSubviews()
+        super.layoutSubviews();
         
-        layoutBackgroundLabels()
-        layoutKnob(selectedIndex)
+        layoutBackgroundLabels();
+        layoutKnob(selectedIndex);
+        updateBackgroundColor();
     }
     
     private func layoutKnob(index: Int)
@@ -208,15 +249,20 @@ public class VKSlider: UIControl
         }
     }
     
-    // MARK: Set Selection
+    // MARK: Selection
     
-    func setSelectedIndex(index: Int, animated: Bool)
+    public func setSelectedIndex(index: Int, animated: Bool)
     {
         if selectedIndex != index
         {
             assert(index >= 0 && index < titles.count);
             updateSlider(index, animated: animated);
         }
+    }
+    
+    public func getSelectedIndex() -> Int
+    {
+        return selectedIndex;
     }
     
     // MARK: Update Slider

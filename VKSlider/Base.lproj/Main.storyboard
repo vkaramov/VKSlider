@@ -25,6 +25,14 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="35" id="yxu-hV-Xvs"/>
                                 </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="gradientColorStart">
+                                        <color key="value" red="1" green="0.25082455069999998" blue="0.3010860782" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="gradientColorEnd">
+                                        <color key="value" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="changeSelectedIndex:" destination="BYZ-38-t0r" eventType="valueChanged" id="FMl-zI-QWX"/>
                                 </connections>
