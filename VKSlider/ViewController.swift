@@ -17,6 +17,7 @@ class ViewController: UIViewController
     override func viewDidLoad()
     {
         super.viewDidLoad()
+        slider.cornerRadius = 3.0;
         slider.titles = ["First", "Second", "One more long thing"]
     }
     

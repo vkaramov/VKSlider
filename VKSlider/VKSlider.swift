@@ -10,39 +10,50 @@ import UIKit
 
 public class VKSlider: UIControl
 {
-    
-    @IBInspectable public var sliderColor: UIColor = UIColor.whiteColor()
-        {
+    /// Knob's colour
+    @IBInspectable public var knobColor: UIColor = UIColor.whiteColor()
+    {
         didSet
         {
-            sliderView.backgroundColor = sliderColor
+            sliderView.backgroundColor = knobColor
         }
     }
+    /// Knob's label text colour
+    @IBInspectable public var knobTextColor: UIColor = UIColor.darkGrayColor()
     
-    @IBInspectable public var textColorFront: UIColor = UIColor.darkGrayColor()
-    
-    @IBInspectable public var textColorBack: UIColor = UIColor.greenColor()
-        {
+    /// Slider's text colour
+    @IBInspectable public var textColor: UIColor = UIColor.greenColor()
+    {
         didSet
         {
             for label in backgroundLabels
             {
-                label.textColor = textColorBack
+                label.textColor = textColor
             }
         }
     }
     
-    @IBInspectable public var cornerRadius: CGFloat = 12.0
-        {
+    /// Slider's corner radius
+    @IBInspectable public var cornerRadius: CGFloat = 5.0
+    {
         didSet
         {
             layer.cornerRadius = cornerRadius
-            sliderView.layer.cornerRadius = cornerRadius - 2
         }
     }
     
-    @IBInspectable public var sliderInset: CGFloat = 2.0
+    /// Slider's corner radius
+    @IBInspectable public var knobCornerRadius: CGFloat = 2.0
         {
+        didSet
+        {
+            sliderView.layer.cornerRadius = knobCornerRadius;
+        }
+    }
+    
+    /// Knob inset
+    @IBInspectable public var knobInset: CGFloat = 2.0
+    {
         didSet
         {
             setNeedsLayout()
@@ -50,7 +61,7 @@ public class VKSlider: UIControl
     }
     
     public var titles:[String]!
-        {
+    {
         didSet
         {
             setupBackgroundLabels()
@@ -59,7 +70,7 @@ public class VKSlider: UIControl
     
     var selectedIndex: Int = 0
     var font: UIFont = UIFont.preferredFontForTextStyle(UIFontTextStyleBody)
-        {
+    {
         didSet
         {
             for label in backgroundLabels
@@ -71,6 +82,7 @@ public class VKSlider: UIControl
     
     private var labelMargin:CGFloat = 4.0
     private var backgroundLabels: [UILabel] = []
+    private var knobFrameUpdated = false;
     private var sliderView: UIView!
     private var sliderWidth: CGFloat
     {
@@ -89,12 +101,6 @@ public class VKSlider: UIControl
     {
         super.init(coder: aDecoder)
         setup()
-    }
-    
-    override public func prepareForInterfaceBuilder()
-    {
-        super.prepareForInterfaceBuilder()
-        titles = ["One", "Two", "One more"]
     }
     
     override public func intrinsicContentSize() -> CGSize
@@ -130,7 +136,7 @@ public class VKSlider: UIControl
             let label = UILabel()
             label.tag = index
             label.font = font
-            label.textColor = textColorBack
+            label.textColor = textColor
             label.adjustsFontSizeToFitWidth = true
             label.textAlignment = .Center
             addSubview(label)
@@ -147,17 +153,17 @@ public class VKSlider: UIControl
     
     private func setupSliderView()
     {
-        sliderView = UIView()
-        sliderView.backgroundColor = sliderColor
-        sliderView.clipsToBounds = true
+        sliderView = UIView();
+        sliderView.backgroundColor = knobColor;
+        sliderView.clipsToBounds = true;
+        sliderView.userInteractionEnabled = true;
         
-        let sliderRecognizer = UIPanGestureRecognizer(target: self, action: "sliderMoved:")
-        sliderView.addGestureRecognizer(sliderRecognizer)
+        let sliderRecognizer = UIPanGestureRecognizer(target: self, action: "sliderMoved:");
+        self.addGestureRecognizer(sliderRecognizer);
         
-        layer.cornerRadius = cornerRadius
-        sliderView.layer.cornerRadius = cornerRadius - 2
+        sliderView.layer.cornerRadius = knobCornerRadius;
         
-        addSubview(sliderView)
+        addSubview(sliderView);
     }
 
     
@@ -168,15 +174,24 @@ public class VKSlider: UIControl
         super.layoutSubviews()
         
         layoutBackgroundLabels()
-        layoutSliderView(selectedIndex)
+        layoutKnob(selectedIndex)
     }
     
-    private func layoutSliderView(index: Int)
+    private func layoutKnob(index: Int)
     {
         let label = backgroundLabels[index]
         let sliderWidth = self.sliderWidth
         
-        sliderView.frame = CGRect(x: CGRectGetMinX(label.frame), y: sliderInset, width: sliderWidth, height: bounds.height - sliderInset * 2)
+        sliderView.frame = CGRect(x: CGRectGetMinX(label.frame), y: knobInset, width: sliderWidth, height: bounds.height - knobInset * 2)
+    }
+    
+    private func updateKnobFrame(index : Int)
+    {
+        let label = backgroundLabels[index];
+        var frame = sliderView.frame;
+        frame.size.width = CGRectGetWidth(label.frame);
+        
+        self.sliderView.frame = frame;
     }
     
     private func layoutBackgroundLabels()
@@ -197,8 +212,11 @@ public class VKSlider: UIControl
     
     func setSelectedIndex(index: Int, animated: Bool)
     {
-        assert(index >= 0 && index < titles.count)
-        updateSlider(index, animated: animated)
+        if selectedIndex != index
+        {
+            assert(index >= 0 && index < titles.count);
+            updateSlider(index, animated: animated);
+        }
     }
     
     // MARK: Update Slider
@@ -210,7 +228,7 @@ public class VKSlider: UIControl
     
     private func updateSliderWithoutAnimation(index: Int)
     {
-        layoutSliderView(index)
+        layoutKnob(index)
         updateSelectedIndex(index)
     }
     
@@ -227,7 +245,7 @@ public class VKSlider: UIControl
     {
         for (i, label) in backgroundLabels.enumerate()
         {
-            label.textColor = i == index ? textColorFront : textColorBack
+            label.textColor = i == index ? knobTextColor : textColor
             label.userInteractionEnabled = i != index
         }
     }
@@ -237,7 +255,7 @@ public class VKSlider: UIControl
         let duration = calculateAnimationDuration(index)
         UIView.animateWithDuration(duration, delay: 0, options: .CurveEaseIn, animations: { () -> Void in
             self.updateSelectedIndex(index)
-            self.layoutSliderView(index)
+            self.layoutKnob(index)
             }, completion: { (finished) -> Void in
                 self.updateColors(index)
         })
@@ -276,11 +294,11 @@ public class VKSlider: UIControl
     
     private func panGestureRecognizerChanged(recognizer: UIPanGestureRecognizer)
     {
-        let minPos = sliderInset
-        let maxPos = minPos + sliderView.bounds.width
+        let minPos = knobInset
+        let maxPos = CGRectGetMinX((backgroundLabels.last?.frame)!);
         
-        let translation = recognizer.translationInView(recognizer.view!)
-        recognizer.view!.center.x += translation.x
+        let translation = recognizer.translationInView(sliderView)
+        sliderView.center.x += translation.x
         recognizer.setTranslation(CGPointZero, inView: recognizer.view!)
         
         if sliderView.frame.origin.x < minPos
@@ -291,12 +309,58 @@ public class VKSlider: UIControl
         {
             sliderView.frame.origin.x = maxPos
         }
+        
+        if (!knobFrameUpdated)
+        {
+            let index = getOverlappedLabelIndex(translation.x >= 0 ? .Max : .Min);
+            if (index != selectedIndex)
+            {
+                updateKnobFrame(index);
+                knobFrameUpdated = true;
+            }
+        }
+    }
+    
+    private func getOverlappedLabelIndex(check: CheckPosition) -> Int
+    {
+        var x = sliderView.center.x;
+        
+        switch (check)
+        {
+        case .Min:
+            x = CGRectGetMinX(sliderView.frame);
+            break;
+        
+        case .Center:
+            x = sliderView.center.x;
+            break;
+            
+        case .Max:
+            x = CGRectGetMaxX(sliderView.frame);
+            break;
+        }
+        
+        var index = 0;
+        for (i, label) in backgroundLabels.enumerate()
+        {
+            if (x >= CGRectGetMinX(label.frame) && x <= CGRectGetMaxX(label.frame))
+            {
+                index = i;
+                break;
+            }
+        }
+        return index;
     }
     
     private func panGestureRecognizerFinished(recognizer: UIPanGestureRecognizer)
     {
-        let index = sliderView.center.x > sliderWidth ? 1 : 0
-        updateSliderWithAnimation(index)
+        let index = getOverlappedLabelIndex(.Center);
+        updateSliderWithAnimation(index);
+        knobFrameUpdated = false;
     }
-    
+}
+
+private enum CheckPosition
+{
+    case Min, Center, Max;
 }
