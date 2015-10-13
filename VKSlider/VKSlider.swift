@@ -153,8 +153,9 @@ public class VKSlider: UIControl
     
     private func setupBackground()
     {
-        userInteractionEnabled = true
-        layer.cornerRadius = cornerRadius
+        userInteractionEnabled = true;
+        layer.cornerRadius = cornerRadius;
+        self.clipsToBounds = true;
     }
     
     private func setupBackgroundLabels()
