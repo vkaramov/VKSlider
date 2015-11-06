@@ -177,6 +177,8 @@ public class VKSlider: UIControl
             let recognizer = UITapGestureRecognizer(target: self, action: "handleRecognizerTap:")
             label.addGestureRecognizer(recognizer)
         }
+        updateColors(selectedIndex);
+        
         invalidateIntrinsicContentSize()
     }
     
